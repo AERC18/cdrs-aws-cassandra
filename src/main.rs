@@ -6,6 +6,8 @@ use cdrs::query::*;
 use cdrs::query_values;
 use cdrs::types::from_cdrs::FromCDRSByName;
 use cdrs::types::prelude::*;
+use cdrs::query::QueryParamsBuilder;
+use cdrs::consistency::Consistency;
 
 use cdrs_helpers_derive::{TryFromRow};
 
@@ -87,7 +89,11 @@ fn insert(session: &CurrentSession) {
     let description = "Some description";
 
     let values = query_values!(user_id, description);
-    session.query_with_values(INSERT, values).unwrap();
+    let query_params = QueryParamsBuilder::new()
+        .consistency(Consistency::LocalQuorum)
+        .values(values)
+        .finalize();
+    session.query_with_params(INSERT, query_params).unwrap();
 }
 
 fn query(session: &CurrentSession) {
@@ -116,9 +122,12 @@ fn update(session: &CurrentSession) {
     let user_id: Uuid = Uuid::parse_str("534a87db-df22-48eb-901b-4fac9c392954").unwrap();
     const UPDATE: &'static str = "UPDATE aws_cassandra_test.table_test SET description = ? WHERE user_id = ?;";
     let new_description = "Updated description.";
-    session
-        .query_with_values(UPDATE, query_values!(new_description, user_id))
-        .expect("update");
+    let values = query_values!(new_description, user_id);
+    let query_params = QueryParamsBuilder::new()
+        .consistency(Consistency::LocalQuorum)
+        .values(values)
+        .finalize();
+    session.query_with_params(UPDATE, query_params).unwrap();
 }
 
 fn delete(session: &CurrentSession) {
@@ -126,5 +135,9 @@ fn delete(session: &CurrentSession) {
     const DELETE: &'static str = "DELETE FROM aws_cassandra_test.table_test WHERE user_id = ?;";
     let user_id: Uuid = Uuid::parse_str("534a87db-df22-48eb-901b-4fac9c392954").unwrap();
     let values = query_values!(user_id);
-    session.query_with_values(DELETE, values).expect("Deletion error.");
+    let query_params = QueryParamsBuilder::new()
+        .consistency(Consistency::LocalQuorum)
+        .values(values)
+        .finalize();
+    session.query_with_params(DELETE, query_params).unwrap();
 }
