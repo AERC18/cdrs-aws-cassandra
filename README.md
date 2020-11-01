@@ -12,7 +12,7 @@ rustup 1.21.1 (7832b2ebe 2019-12-20) or greater
 cargo 1.40.0 (bc8e4c8be 2019-11-22) or greater 
 rustc 1.40.0 (73528e339 2019-12-16) or greater
 ```
-2. Amazon Managed Apache Cassandra Service deployment
+2. Amazon Managed Apache Cassandra Service deployment:
 [Getting Started](https://docs.aws.amazon.com/mcs/latest/devguide/getting-started.html)
 
 3. Set this environment variables: 

@@ -6,6 +6,8 @@ use cdrs::query::*;
 use cdrs::query_values;
 use cdrs::types::from_cdrs::FromCDRSByName;
 use cdrs::types::prelude::*;
+use cdrs::query::QueryParamsBuilder;
+use cdrs::consistency::Consistency;
 
 use cdrs_helpers_derive::{TryFromRow};
 
@@ -87,7 +89,11 @@ fn insert(session: &CurrentSession) {
     let description = "Some description";
 
     let values = query_values!(user_id, description);
-    session.query_with_values(INSERT, values).unwrap();
+    let query_params = QueryParamsBuilder::new()
+        .consistency(Consistency::LocalQuorum)
+        .values(values)
+        .finalize();
+    session.query_with_params(INSERT, query_params).unwrap();
 }
 
 fn query(session: &CurrentSession) {
