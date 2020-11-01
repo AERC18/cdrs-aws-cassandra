@@ -135,5 +135,9 @@ fn delete(session: &CurrentSession) {
     const DELETE: &'static str = "DELETE FROM aws_cassandra_test.table_test WHERE user_id = ?;";
     let user_id: Uuid = Uuid::parse_str("534a87db-df22-48eb-901b-4fac9c392954").unwrap();
     let values = query_values!(user_id);
-    session.query_with_values(DELETE, values).expect("Deletion error.");
+    let query_params = QueryParamsBuilder::new()
+        .consistency(Consistency::LocalQuorum)
+        .values(values)
+        .finalize();
+    session.query_with_params(DELETE, query_params).unwrap();
 }
